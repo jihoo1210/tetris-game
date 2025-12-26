@@ -1,0 +1,33 @@
+{
+  "devDependencies": {
+    "playwright": "^1.57.0"
+  },
+  "name": "tetris-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "playwright_test.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "@capacitor/android": "^5.7.0",
+    "@capacitor/cli": "^5.7.0",
+    "@capacitor/core": "^5.7.0",
+    "playwright-core": "^1.57.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/jihoo1210/tetris-game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jihoo1210/tetris-game/issues"
+  },
+  "homepage": "https://github.com/jihoo1210/tetris-game#readme"
+}

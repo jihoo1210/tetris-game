@@ -1,0 +1,8 @@
+{
+  "appId": "com.tetris.game",
+  "appName": "TetrisGame",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

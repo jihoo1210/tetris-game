@@ -1,0 +1,61 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c \"if not exist backup mkdir backup\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c \"if not exist logs mkdir logs && echo [%date% %time%] Modified >> logs\\changes.log\""
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c \"if not exist logs mkdir logs && echo [%date% %time%] Agent completed >> logs\\agents.log\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd /c \"if not exist logs mkdir logs && echo [%date% %time%] Session ended >> logs\\session.log\""
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash",
+      "mcp__context7__*",
+      "mcp__playwright__*",
+      "mcp__sequential-thinking__*",
+      "mcp__filesystem__*",
+      "mcp__github__*"
+    ]
+  }
+}
