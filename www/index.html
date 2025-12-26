@@ -22,10 +22,26 @@
             border: 2px solid #333;
             border-radius: 4px;
         }
+        #download-link {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        #download-link:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
     <div id="game-container"></div>
+    <a id="download-link" href="https://github.com/jihoo1210/tetris-game/raw/main/app-debug.apk">앱 다운로드</a>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <script>
