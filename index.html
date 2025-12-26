@@ -157,7 +157,16 @@
         let keySpace = null;         // 스페이스 키
         let keyR = null;             // R 키
 
+        // UI 텍스트 오브젝트
+        let scoreText = null;
+        let levelText = null;
+        let linesText = null;
+        let nextText = null;
+        let gameOverText = null;
+        let restartText = null;
+
         let needsRedraw = true;      // 다시 그리기 필요 플래그
+        let scene = null;            // Phaser Scene 참조
 
         // ========================================
         // Phaser 게임 설정
@@ -192,6 +201,8 @@
         }
 
         function create() {
+            scene = this;
+
             // 그래픽스 객체 생성
             graphics = this.add.graphics();
 
@@ -200,15 +211,35 @@
             keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
             keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
+            // UI 텍스트 생성
+            const textStyle = { fontSize: '12px', fontFamily: 'Courier New', color: '#ffffff' };
+            const uiX = GAME_WIDTH + 10;
+
+            nextText = this.add.text(uiX, 10, 'NEXT', textStyle);
+            scoreText = this.add.text(uiX, 120, 'SCORE\n0', textStyle);
+            levelText = this.add.text(uiX, 180, 'LEVEL\n1', textStyle);
+            linesText = this.add.text(uiX, 240, 'LINES\n0', textStyle);
+
+            // 게임오버 텍스트 (숨김)
+            const gameOverStyle = { fontSize: '20px', fontFamily: 'Courier New', color: '#ff0000', align: 'center' };
+            gameOverText = this.add.text(GAME_WIDTH / 2, CANVAS_HEIGHT / 2 - 20, 'GAME OVER', gameOverStyle);
+            gameOverText.setOrigin(0.5);
+            gameOverText.setVisible(false);
+
+            const restartStyle = { fontSize: '12px', fontFamily: 'Courier New', color: '#ffffff', align: 'center' };
+            restartText = this.add.text(GAME_WIDTH / 2, CANVAS_HEIGHT / 2 + 20, 'Press R to restart', restartStyle);
+            restartText.setOrigin(0.5);
+            restartText.setVisible(false);
+
             // 게임 초기화
             initGame.call(this);
         }
 
         function update(time, delta) {
-            if (gameOver || isPaused) return;
-
-            // 키보드 입력 처리
+            // 키보드 입력 처리 (게임오버 시에도 R키 처리)
             handleInput.call(this);
+
+            if (gameOver || isPaused) return;
 
             // 화면 갱신
             if (needsRedraw) {
@@ -237,6 +268,13 @@
             gameOver = false;
             isPaused = false;
             dropInterval = 1000;
+
+            // UI 텍스트 초기화
+            if (scoreText) scoreText.setText('SCORE\n0');
+            if (levelText) levelText.setText('LEVEL\n1');
+            if (linesText) linesText.setText('LINES\n0');
+            if (gameOverText) gameOverText.setVisible(false);
+            if (restartText) restartText.setVisible(false);
 
             // 7-Bag 초기화
             bag = [];
@@ -294,6 +332,9 @@
                 if (dropTimer) {
                     dropTimer.remove();
                 }
+                // 게임오버 UI 표시
+                if (gameOverText) gameOverText.setVisible(true);
+                if (restartText) restartText.setVisible(true);
             }
 
             needsRedraw = true;
@@ -392,6 +433,7 @@
             while (moveDown()) {
                 score += 2;
             }
+            if (scoreText) scoreText.setText('SCORE\n' + score);
             lockPiece();
         }
 
@@ -445,8 +487,12 @@
             if (clearedLines > 0) {
                 // 점수 계산
                 const lineScores = [0, 100, 300, 500, 800];
-                score += lineScores[clearedLines] * level;
+                score += lineScores[Math.min(clearedLines, 4)] * level;
                 lines += clearedLines;
+
+                // UI 업데이트
+                if (scoreText) scoreText.setText('SCORE\n' + score);
+                if (linesText) linesText.setText('LINES\n' + lines);
 
                 // 레벨업 체크 (10줄마다)
                 const newLevel = Math.floor(lines / 10) + 1;
@@ -455,6 +501,7 @@
                     // 속도 증가 (10%씩)
                     dropInterval = Math.max(100, 1000 * Math.pow(0.9, level - 1));
                     updateDropTimer();
+                    if (levelText) levelText.setText('LEVEL\n' + level);
                 }
             }
 
@@ -515,6 +562,7 @@
             if (Phaser.Input.Keyboard.JustDown(cursors.down)) {
                 if (moveDown()) {
                     score += 1;
+                    if (scoreText) scoreText.setText('SCORE\n' + score);
                 }
             }
 
@@ -685,17 +733,13 @@
             const piece = TETROMINOS[nextPiece][0];
             const miniCellSize = 15;
 
-            // "NEXT" 텍스트 영역
-            graphics.fillStyle(0x888888, 1);
-            graphics.fillRect(startX, startY - 20, 80, 15);
-
             // 다음 블록 그리기
             const offsetX = (80 - piece[0].length * miniCellSize) / 2;
             for (let row = 0; row < piece.length; row++) {
                 for (let col = 0; col < piece[row].length; col++) {
                     if (piece[row][col]) {
                         const x = startX + offsetX + col * miniCellSize;
-                        const y = startY + 10 + row * miniCellSize;
+                        const y = startY + 20 + row * miniCellSize;
                         graphics.fillStyle(COLORS[nextPiece], 1);
                         graphics.fillRect(x, y, miniCellSize - 1, miniCellSize - 1);
                     }
@@ -707,13 +751,6 @@
             // 반투명 오버레이
             graphics.fillStyle(0x000000, 0.7);
             graphics.fillRect(0, 0, GAME_WIDTH, CANVAS_HEIGHT);
-
-            // 게임오버 박스
-            graphics.fillStyle(0x1a1a2e, 1);
-            graphics.fillRect(30, CANVAS_HEIGHT / 2 - 60, GAME_WIDTH - 60, 120);
-
-            graphics.lineStyle(2, 0xff0000, 1);
-            graphics.strokeRect(30, CANVAS_HEIGHT / 2 - 60, GAME_WIDTH - 60, 120);
         }
     </script>
 </body>
