@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tetris</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <meta name="theme-color" content="#1a1a2e">
     <style>
         * {
             margin: 0;
@@ -767,6 +770,20 @@
             // 반투명 오버레이
             graphics.fillStyle(0x000000, 0.7);
             graphics.fillRect(0, 0, GAME_WIDTH, CANVAS_HEIGHT);
+        }
+    </script>
+    <script>
+        // Service Worker 등록
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
         }
     </script>
 </body>
