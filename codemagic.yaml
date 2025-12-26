@@ -1,0 +1,19 @@
+workflows:
+  android-build:
+    name: Android Build
+    max_build_duration: 30
+    environment:
+      java: 17
+      node: 18
+    scripts:
+      - name: Clear Gradle cache
+        script: rm -rf ~/.gradle/caches
+      - name: Install dependencies
+        script: npm install
+      - name: Build Android
+        script: |
+          npx cap sync android
+          chmod +x android/gradlew
+          cd android && ./gradlew assembleDebug --no-daemon
+    artifacts:
+      - android/app/build/outputs/**/*.apk
