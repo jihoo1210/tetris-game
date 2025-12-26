@@ -40,10 +40,29 @@
         #download-link:hover {
             background-color: #45a049;
         }
+        #install-btn {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            display: none;
+        }
+        #install-btn:hover {
+            background-color: #1976D2;
+        }
     </style>
 </head>
 <body>
     <div id="game-container"></div>
+    <button id="install-btn">앱 설치</button>
     <a id="download-link" href="https://github.com/jihoo1210/tetris-game/raw/main/app-debug.apk">앱 다운로드</a>
 
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
@@ -784,6 +803,41 @@
                         console.log('ServiceWorker registration failed:', error);
                     });
             });
+        }
+
+        // PWA 설치 버튼
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
+        // beforeinstallprompt 이벤트 캡처
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        // 설치 버튼 클릭
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log('Install outcome:', outcome);
+
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        });
+
+        // 이미 설치된 경우 버튼 숨김
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed');
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        });
+
+        // standalone 모드로 실행 중이면 버튼 숨김
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            installBtn.style.display = 'none';
         }
     </script>
 </body>
